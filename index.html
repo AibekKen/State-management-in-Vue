@@ -1,0 +1,387 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>reveal.js</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/white.css">
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section data-background-color="black">
+        <h2>State management in Vue</h2>
+        <aside class="notes">
+          Hello everyone! My name is Aibek. I'm student of JS/Frontend course stage 2 in RSSchool. A topic which I want
+          to present now is State management in a Vue.js
+        </aside>
+      </section>
+      <section data-auto-animate data-background-color="black">
+        <aside class="notes">
+          First I have to start with the answer to the next question
+          What is a state?
+        </aside>
+        <H3>What is a "state"?</H3>
+      </section>
+      <section data-auto-animate data-background-color="black">
+        <H3>What is a "state"?</H3>
+        <ul>
+          <li>the source of truth that drives our app</li>
+        </ul>
+        <aside class="notes">
+          according to documentation state is the source of truth that drives our app
+        </aside>
+      </section>
+      <section data-background-color="black" data-auto-animate>
+        <H3>What is a "state"?</H3>
+        <ul>
+          <li>the source of truth that drives our app</li>
+          <li>is everything that exists in memory when the app is running</li>
+          <aside class="notes">
+            next definition: the state is everything that exists in memory when the app is running. Or with other words,
+            it's all variables in the app
+
+            <p> And when we say “state” in Vue actually we mean reactive state. For example, when we change state value
+              it
+              will immediately change on view. In a nutshell. Because today we won't talk about reactivity deeply. Its
+              topic
+              for another presentation.</p>
+          </aside>
+        </ul>
+      </section>
+      <section data-background-color="black">
+        <H3>How to manage states in Vue js?</H3>
+        <ul>
+          <li class="fragment"> In single components </li>
+          <li class="fragment"> Reactivity API </li>
+          <li class="fragment"> Vuex </li>
+        </ul>
+        <aside class="notes">
+          Today we are going to talk about how to manage states.
+
+          <ul>
+            We have 3 basic options to manage states in Vue js
+            <li> State management in single components</li>
+            <li>by using Reactivity API</li>
+            <li>and the last one with Vuex</li>
+          </ul>
+        </aside>
+      </section>
+      <section data-background-color="black">
+        <section>
+          <H4>State management in single components</H4>
+          <aside class="notes">
+            Basically, every component could manage its own reactive state. let's look at the simple Vue component
+          </aside>
+        </section>
+        <section>
+          <aside class="notes">
+            We use the data option to declare reactive state of a component. And then we can mutate this state with any
+            method. </aside>
+          We use the data option to declare reactive state of a component
+          <pre><code data-line-numbers="3,4,8-12" data-trim data-noespace>
+            <!-- Component.vue -->
+            <template>
+              <div> {{count}} </div>
+              <button @click="count++">Increment</button>
+            </template>
+            
+            <script>
+              export default {
+                data() {
+                  return {
+                    count: 0
+                  }
+                },
+              }
+            </script>
+          </code></pre>
+        </section>
+        <section>
+          <aside class="notes">
+            We could pass its state as props for child components or lifting up.
+            <p>It's okay for simple and small apps. But in practice, apps don't consist of only 2 or 3 components.</p>
+          </aside>
+          <h4>We could pass its state as props for child components or lifting up to parent.</h4>
+          <img src='/images/simple1.png'>
+        </section>
+        <section data-auto-animate>
+          <h4>What if we have app with complicated structure?</h4>
+          <img src='/images/complicated1.png'>
+          <aside class="notes">
+            Usually, in an app, we have many components that work with the same state...
+          </aside>
+        </section>
+        <section data-auto-animate>
+          <h4>What if we have app with complicated structure?</h4>
+          <img src='/images/complicated2.png'>
+          <aside class="notes">
+            And we have to pass down or lift
+            up one state between components which could be in different places in the app.
+          </aside>
+        </section>
+        <section>
+          <H3>What are the disadvantages of this way?</H3>
+          <ul>
+            <li>Components could depend on the common state</li>
+            <li>Actions in multiple components may lead to mutating same state </li>
+          </ul>
+          <aside class="notes">
+            <ul>
+              Its have next disadvantages for us
+              <li>Multiple components views could depend on the common state</li>
+              <li>Actions in multiple components may lead to mutating the same state</li>
+            </ul>
+            And in that case, it isn't an optimal way to manage states.
+          </aside>
+        </section>
+      </section>
+      <section data-background-color="black">
+        <section>
+          <H4>Reactivity API</H4>
+          <aside class="notes">
+            The first solution for this issue is simple state management with Reactivity API in Vue 3
+          </aside>
+        </section>
+        <section>
+          <b>Step 1:</b> use <span style="color: green">reactive()</span> to create a reactive object
+          <pre><code data-line-numbers>
+            // store.js
+            import { reactive } from 'vue'
+             
+            export const store = reactive({
+              count: 0
+            })
+          </code></pre>
+          <aside class="notes">
+            In this option, we could create a common js file where we store our state by using the reactive() option to
+            create a reactive object and just export it </aside>
+        </section>
+        <section data-auto-animate>
+          Step 2: import it from multiple components
+          <pre><code data-line-numbers>
+            <!-- ComponentA.vue -->
+            <script>
+              import { store } from './store.js'
+
+              export default {
+                data() {
+                  return {
+                    store
+                  }
+                }
+              }
+            </script>
+             
+            <template>From A: {{ store.count }}</template>
+          </code></pre>
+          <aside class="notes">
+            then import it in any components: </aside>
+        </section>
+        <section data-auto-animate>
+          Step 2: import it from multiple components
+          <pre><code data-line-numbers>
+            <!-- ComponentB.vue -->
+            <script>
+              import { store } from './store.js'
+
+              export default {
+                data() {
+                  return {
+                    store
+                  }
+                }
+              }
+            </script>
+             
+            <template>From B: {{ store.count }}</template>
+            
+          </code></pre>
+          <aside class="notes">
+            Now, whenever the store object is mutated, both <ComponentA> and <ComponentB> will update their views
+                automatically </aside>
+        </section>
+        <section>
+          <H5>And then...</H5>
+          <ul>
+            <li>Any component importing store can mutate it
+              <pre><code> 
+<button @click="store.count++">
+  From B: {{ store.count }}
+</button>
+            </code></pre>
+            </li>
+            <li>We could define methods in store for safety
+              <pre><code>// store.js
+export const store = reactive({
+    count: 0,
+    increment() {
+      this.count++
+    }
+})
+// component 
+<button @click="store.increment()">+</button>
+              </code></pre>
+            </li>
+          </ul>
+          <aside class="notes">
+            <li> And any component importing store can mutate it however they want:</li>
+            <li>We could define methods in store for safety
+            </li>
+          </aside>
+        </section>
+      </section>
+      <section data-background-color="black">
+        <section>
+          <h3>VUEX</h3>
+          <span class="fragment">State management pattern</span> <span class="fragment">+</span> <span
+            class="fragment">library for Vue.js apps</span>
+          <aside class="notes">
+            <p> Next solution is Vuex</p>
+            <p>Vuex is a state management pattern + library for Vue.js applications.
+              Centralized store for all the components in an application,
+            </p>
+          </aside>
+        </section>
+        <section data-auto-animate>
+          <h3>Core Concepts</h3>
+          <pre><code data-line-numbers="2,5 | 6-18 | 20-25 | 27-35 | 37 - 45" data-trim data-noescape>
+import { createApp } from 'vue'
+import { createStore } from 'vuex'
+            
+// Create a new store instance.
+ const store = createStore({ 
+ state: { 
+    return {
+      users: [  
+        { 
+          id: 1,
+          name: Tom,              
+          status: 'active' 
+        },
+      ....
+      ]
+    }
+  },
+// component: this.$store.users
+
+  getters: {
+    getActiveUsers(state) {
+      return state.users.filter((user) => user.status === 'active')
+    }
+  },
+// component: this.$store.getters.getActiveUsers
+
+  mutations: {
+    updateUsers(state, users) {
+      state.users = users;
+    },
+    addUser (state, user) {
+      state.users.push(user);
+    }
+  },
+// component: this.$store.commit('updateUsers', users)
+
+  actions: {
+    async fetchUsers(context) {
+    const res = await fetch(url);
+    const users = await res.json();
+    context.commit('updateUsers', users);
+    }
+  },
+  // component: this.$store.dispatch('fetchUsers');
+})
+</code></pre>
+          <aside class="notes">
+            <ul>Core Concepts
+
+              <li> State : Vuex uses a single state tree - that is, this single object contains all your applications
+                state</li>
+              <li>Getters: computed properties for stores. In the example, we could filtered users and get only active
+              </li>
+              <li>Mutations: The only way to actually change state in a Vuex store is by committing a mutation.
+              </li>
+              <li>Actions commit mutations. But the main difference between actions and mutations, actions can run
+                asynchronous operations. And we could fetch data from any API and then use it to mutate states.
+              </li>
+            </ul>
+          </aside>
+        </section>
+        <section data-auto-animate>
+          <h3>Core Concepts: modules</h3>
+          <pre><code data-line-numbers data-trim data-noescape>
+            const moduleA = {
+              state: () => ({ ... }),
+              mutations: { ... },
+              actions: { ... },
+              getters: { ... }
+            }
+            
+            const moduleB = {
+              state: () => ({ ... }),
+              mutations: { ... },
+              actions: { ... }
+            }
+            
+            const store = createStore({
+              modules: {
+                a: moduleA,
+                b: moduleB
+              }
+            })
+            
+            store.state.a // -> `moduleA`'s state
+            store.state.b // -> `moduleB`'s state
+</code></pre>
+          <aside class="notes">
+            next core concepts is Modules:
+            Vuex allows us to divide our store into modules. Each module can contain its own state, mutations, actions,
+            getters, and even nested modules
+          </aside>
+        </section>
+      </section>
+      <section data-background-color="black">
+        <h3>What we should to use?</h3>
+        <p><span class="fragment">For simple app</span> <span class="fragment"> > simple store pattern</span></p>
+        <p><span class="fragment">For medium-to-large-scale SPA</span> <span class="fragment"> > Vuex </span></p>
+        <aside class="notes">
+          What we should to use?
+          <li> For simple apps we can use simple store pattern: manage in each component or manage by using Reactivity
+            API</li>
+          <li> For medium-to-large-scale SPA Vuex is best solution today</li>
+        </aside>
+      </section>
+      <section>
+        <h3>Thank you for you attentions</h3>
+      </section>
+    </div>
+  </div>
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      backgroundTransition: 'concave',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
